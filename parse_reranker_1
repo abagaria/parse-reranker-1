@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# project 1
+# parse-reranker-1
+
+train_file=$1
+output_file=$2
+
+#
+#   We will be running this script to grade your assignment. Note that failure
+# to run this program with this script will result in a 15% deduction in your
+# grade, regardless of if you provide other instructions on how to run your
+# program.
+#
+#   If you are having difficulty getting the script to run your program, talk
+# to the TAs.
+##############################################################################
+
+python parse_reranker_1.py $train_file | tee $output_file
+
+##############################################################################
+# Run this script with the command
+#
+#   ./warmup train.txt output.txt
