@@ -16,7 +16,7 @@ output_file=$2
 # to the TAs.
 ##############################################################################
 
-python parse_reranker_1.py $train_file | tee $output_file
+python main.py $train_file | tee $output_file
 
 ##############################################################################
 # Run this script with the command

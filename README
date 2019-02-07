@@ -1,16 +1,13 @@
-In your README, please note down a brief description talking about your 
-rationale behind the hyperparameters used. If you have tried experimenting 
-with hyperparameters, please note down:
+Parse re-ranker (HW 1)
+- My final perplexity score on the validation data = 9.7
+- My hyperparameters:
+    - HIDDEN_SIZE = 1500
+    - EMBEDDING_SIZE = 100
+    - BATCH_SIZE = 20
+    - WINDOW_LENGTH = 50
+    - RNN_LAYERS = 1
+    - NUM_EPOCHS = 1
+- I tried training for more epochs (5), but that resulted in overfitting (dev loss and dev perplexity went up while the training loss + perplexity went down)
+- In order to mitigate overfitting while training for more epochs, I tried adding dropout (with probability 0.5) to the embedding layer. While this helped the perplexity score was 10.46)
+- I think that in order to train for more than 1 epoch and not overfit, I would have to shuffle the sentences in between epochs so as to prevent the model from memorizing the training data.
 
-- What hyperparameter experiments you have tried,
-- For each experiment, what the results were,
-- A brief discussion comparing and contrasting the results between the 
-  experiments, and why the results were the way they were.
-
-The professor was able to achieve a perplexity of ~20, so try to aim for 
-that number. However, even if you were not able to achieve good results 
-with any of the models developed, if you provide a substantial report 
-describing multiple experiments, rationale behind why the experiments were 
-attempted and why they did/didn't work, and discussion on why some worked 
-better than others, etc. you will be able to receive substantial 
-partial credit.
