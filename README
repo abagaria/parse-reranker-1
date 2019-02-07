@@ -1,4 +1,5 @@
 Parse re-ranker (HW 1)
+- Please note that the main file to run in `main.py`
 - My final perplexity score on the validation data = 9.7
 - My hyperparameters:
     - HIDDEN_SIZE = 1500
