@@ -2,47 +2,60 @@
 import sys
 import pdb
 from tqdm import tqdm
+import numpy as np
 
 # PyTorch imports.
 import torch
 import torch.nn as nn
-from torch.utils.data import DataLoader
 from torch import optim
-from torch.nn.utils.rnn import pack_padded_sequence
+from torch.utils.data import DataLoader
+from tensorboardX import SummaryWriter
 
 # Other imports.
+from vocab import Vocab
 from dataset import ParserDataset
-from parse_reranker_1 import NeuralParser
+from model import NeuralParser
 from hyperparameters import *
 
 
 def train(input_file):
-    device = torch.device("cpu")
-    dset = ParserDataset(input_file)
-    loader = DataLoader(dset, batch_size=BATCH_SIZE, shuffle=True, drop_last=True)
-    vocab_size = dset.get_vocab_size()
-    model = NeuralParser(vocab_size, EMBEDDING_SIZE, HIDDEN_SIZE, RNN_LAYERS)
+    vocab_object = Vocab(input_file, padding=False)
+    vocab_size = vocab_object.get_vocab_size()
+    dataset = ParserDataset(vocab_object)
+    loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=True)
+
+    network = NeuralParser(vocab_size, EMBEDDING_SIZE, HIDDEN_SIZE, RNN_LAYERS, BATCH_SIZE, device)
+    network.train()
+
     loss_function = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters())
+    optimizer = optim.Adam(network.parameters())
     training_loss, validation_loss = [], []
+    n_iterations = 0
 
     for epoch in range(1, NUM_EPOCHS + 1):
-        for vectorized_seq, seq_len in tqdm(loader, desc='{}/{}'.format(epoch, NUM_EPOCHS)):
-            vectorized_seq = vectorized_seq.to(device)
+        hidden_state = network.init_hidden(BATCH_SIZE)
+        for input_sequence, label_sequence in tqdm(loader, desc='{}/{}'.format(epoch, NUM_EPOCHS)):
+            input_sequence = input_sequence.to(device)
+            label_sequence = label_sequence.to(device)
 
-            start_tokens = torch.ones(vectorized_seq.shape[0], 1, dtype=torch.long, device=device) * START_TOKEN
-            input_sequence = torch.cat((start_tokens, vectorized_seq), 1)
+            hidden_state = hidden_state.detach()
+            network.zero_grad()
+            logits, hidden_state = network(input_sequence, hidden_state)
 
-
-            pdb.set_trace()
-
-            model.train()
-            model.zero_grad()
-            logits = model(vectorized_seq, seq_len)
-            loss = loss_function(logits, label_seq)
+            loss = loss_function(logits.view(-1, vocab_size), label_sequence.view(-1))
+            perplexity = np.exp(loss.item())
 
             loss.backward()
             optimizer.step()
+
+            n_iterations = n_iterations + 1
+            training_loss.append(loss.item())
+
+            # Logging
+            writer.add_scalar("TrainingLoss", loss.item(), n_iterations)
+            writer.add_scalar("TrainingPerplexity", perplexity, n_iterations)
+
+    return training_loss
 
 
 def evaluate():
@@ -50,10 +63,14 @@ def evaluate():
 
 
 def main():
-    train(input_file_name)
+    training_loss_history = train(input_file_name)
     evaluate()
+
+    return training_loss_history
 
 
 if __name__ == "__main__":
     input_file_name = sys.argv[1]
-    main()
+    device = torch.device("cpu")
+    writer = SummaryWriter()
+    t_loss = main()
