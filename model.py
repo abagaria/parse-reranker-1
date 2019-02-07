@@ -19,6 +19,7 @@ class NeuralParser(nn.Module):
         self.device = device
 
         self.embedding = nn.Embedding(vocab_size, embedding_size)
+        self.dropout = nn.Dropout(p=0.5)
         self.rnn_encoder = nn.GRU(self.embedding_size, self.hidden_size, num_layers=rnn_layers, batch_first=True)
         self.fc = nn.Linear(self.hidden_size, self.vocab_size)
 
@@ -26,7 +27,8 @@ class NeuralParser(nn.Module):
 
     def forward(self, tokens, hidden):
         embeds = self.embedding(tokens)
-        output, new_hidden = self.rnn_encoder(embeds, hidden)
+        dropped_embeds = self.dropout(embeds)
+        output, new_hidden = self.rnn_encoder(dropped_embeds, hidden)
         logits = self.fc(output)
         return logits, new_hidden
 
