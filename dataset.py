@@ -1,5 +1,6 @@
 # Python imports.
 import pdb
+from collections import defaultdict
 
 # PyTorch imports.
 import torch
@@ -13,14 +14,16 @@ from hyperparameters import WINDOW_LENGTH
 class ParserDataset(Dataset):
     """ Dataset module for our parse re-ranker. """
 
-    def __init__(self, vocab_object):
+    def __init__(self, sentences, vocab, reverse_vocab):
         """
         Args:
-            vocab_object (Vocab)
+            sentences (list): list of sentences in training / dev data
+            vocab (defaultdict)
+            reverse_vocab (defaultdict)
         """
-        self.vocab = vocab_object.vocab
-        self.reverse_vocab = vocab_object.reverse_vocab
-        self.sentences = vocab_object.training_data
+        self.vocab = vocab
+        self.reverse_vocab = reverse_vocab
+        self.sentences = sentences
         self.training_data = self._create_string_windows()
 
     def _create_string_windows(self):
