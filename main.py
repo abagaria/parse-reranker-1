@@ -33,7 +33,7 @@ def train(input_file):
     loaders = {mode: DataLoader(datasets[mode], batch_size=BATCH_SIZE, shuffle=False, drop_last=True) for mode in modes}
     network = NeuralParser(vocab_size, EMBEDDING_SIZE, HIDDEN_SIZE, RNN_LAYERS, BATCH_SIZE, device)
 
-    loss_function = nn.CrossEntropyLoss()
+    loss_function = nn.CrossEntropyLoss().to(device)
     optimizer = optim.Adam(network.parameters())
     hidden_state = network.init_hidden(BATCH_SIZE)
 
@@ -91,6 +91,6 @@ def main():
 
 if __name__ == "__main__":
     input_file_name = sys.argv[1]
-    device = torch.device("cpu")
+    device = torch.device("cuda")
     writer = SummaryWriter()
     t_loss, v_loss = main()
