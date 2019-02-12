@@ -39,3 +39,6 @@ class Vocab(object):
             vocab[word] = idx + num_special_tokens
             reverse_vocab[idx + num_special_tokens] = word
         return vocab, reverse_vocab
+
+    def get_unk_token(self):
+        return self.vocab["*UNK"]
