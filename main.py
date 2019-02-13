@@ -78,7 +78,10 @@ def train(input_file):
                     network.eval()
                     with torch.no_grad():
                         logits = network(input_sequence, seq_length)
-                        loss = loss_function(logits.view(-1, vocab_size), label_sequence.view(-1))
+                        padded_logits = torch.zeros(BATCH_SIZE, label_sequence.shape[1], vocab_size, device=device)
+                        padded_logits[:, :logits.shape[1], :] = logits
+
+                        loss = loss_function(padded_logits.view(-1, vocab_size), label_sequence.view(-1))
                         perplexity = np.exp(loss.item())
                     n_validation_iterations = n_validation_iterations + 1
                     validation_loss.append(loss.item())
