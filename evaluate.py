@@ -64,6 +64,7 @@ def get_n_best(lines, vocab, unk_token):
                        b) the total number of constituent tags in this parse
                        c) the actual parse itself
     """
+    # pdb.set_trace()
     num_corrects, totals, parses = [], [], []
     for line in lines:
         n1, n2, parse = read_line(line, vocab, unk_token)
@@ -75,8 +76,10 @@ def get_n_best(lines, vocab, unk_token):
 
 def get_sequence_probability(model, sequence):
     seq = sequence.unsqueeze(0)
+    seq = seq.to(device)
     with torch.no_grad():
-        logits, _ = model(seq, model.init_hidden(1))
+        length = torch.tensor(seq.shape[1], device=device).unsqueeze(0)
+        logits = model(seq, length)
         probabilities = F.softmax(logits, dim=2)
         selected_probabilities = probabilities.gather(2, seq.unsqueeze(2))
         sequence_probability = selected_probabilities.log().sum()
@@ -161,7 +164,7 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     writer = SummaryWriter("Evaluation")
     training_data = "data/reranker_train.txt"
-    gen_lines = get_all_lines("data/fake_data.txt")
+    gen_lines = get_all_lines("data/conv.txt")
     gold_lines = get_all_lines("data/gold.txt")
     saved_model = "1_weights.pt"
 
