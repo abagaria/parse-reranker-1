@@ -8,7 +8,7 @@ class Vocab(object):
     PAD_TOKEN = 0
     START_TOKEN = 1
 
-    def __init__(self, input_file, padding=False):
+    def __init__(self, input_file, padding=True):
         self.input_file = input_file
         self.padding = padding
         self.training_data = self._get_training_data()

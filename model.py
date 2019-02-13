@@ -5,6 +5,10 @@ import pdb
 # PyTorch imports.
 import torch
 import torch.nn as nn
+from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
+
+# Other imports.
+from hyperparameters import DROPOUT_PROBABILITY
 
 
 class NeuralParser(nn.Module):
@@ -19,18 +23,27 @@ class NeuralParser(nn.Module):
         self.device = device
 
         self.embedding = nn.Embedding(vocab_size, embedding_size)
-        self.dropout = nn.Dropout(p=0.5)
+        self.dropout = nn.Dropout(p=DROPOUT_PROBABILITY)
         self.rnn_encoder = nn.GRU(self.embedding_size, self.hidden_size, num_layers=rnn_layers, batch_first=True)
         self.fc = nn.Linear(self.hidden_size, self.vocab_size)
 
         self.to(device)
 
-    def forward(self, tokens, hidden):
-        embeds = self.embedding(tokens)
-        dropped_embeds = self.dropout(embeds)
-        output, new_hidden = self.rnn_encoder(dropped_embeds, hidden)
-        logits = self.fc(output)
-        return logits, new_hidden
+    def forward(self, tokens, seq_lens):
+        curr_batch_size = seq_lens.shape[0]
+        embeds = self.dropout(self.embedding(tokens))
+        sorted_seq_lens, perm_idx = seq_lens.sort(0, descending=True)
+        sorted_seq_tensor = embeds[perm_idx]
+
+        packed_input = pack_padded_sequence(sorted_seq_tensor, sorted_seq_lens, batch_first=True)
+        output, final_hidden = self.rnn_encoder(packed_input, self.init_hidden(curr_batch_size))
+        unpacked_output, _ = pad_packed_sequence(output, batch_first=True)
+
+        logits = self.fc(unpacked_output)
+
+        _, unperm_idx = perm_idx.sort(0)
+        unsorted_logits = logits[unperm_idx].squeeze(1)
+        return unsorted_logits
 
     def init_hidden(self, batch_size):
         return torch.zeros(self.rnn_layers, batch_size, self.hidden_size, device=self.device)
