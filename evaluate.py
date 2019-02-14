@@ -20,7 +20,7 @@ def get_vocab():
     with open("reverse_vocab.pkl", "rb") as _f:
         inverse_vocab = pickle.load(_f)
     v_size = len(v)
-    unk = v["UNK*"]
+    unk = v["*UNK"]
     print("Using vocab size {}, UNK token {}".format(v_size, unk))
     return v, inverse_vocab, v_size, unk
 
