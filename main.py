@@ -13,6 +13,7 @@ from torch.utils.data import DataLoader
 from tensorboardX import SummaryWriter
 
 # Other imports.
+from vocab import Vocab
 from dataset import ParserDataset
 from model import NeuralParser
 from utils import create_data_splits
@@ -106,6 +107,11 @@ if __name__ == "__main__":
     input_file_name = sys.argv[1]
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     writer = SummaryWriter()
+
+    # Create vocab
+    v = Vocab(input_file_name)
+
+    # Call training procedure
     t_loss, v_loss = main()
 
     print()
