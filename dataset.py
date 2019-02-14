@@ -79,7 +79,7 @@ class ParserDataset(Dataset):
         return len(self.sentences_tensor)
 
     def __getitem__(self, i):
-        sequence_length = len(self.sentences_tensor[i])
+        sequence_length = len(self.sentences_tensor[i]) - 1
         input_tensor = self.input_sentences[i]
         label_tensor = self.label_sentences[i]
 
