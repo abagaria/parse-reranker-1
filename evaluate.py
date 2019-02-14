@@ -1,4 +1,5 @@
 # Python imports.
+import sys
 import numpy as np
 import pdb
 from collections import defaultdict
@@ -166,8 +167,10 @@ def main():
 if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     writer = SummaryWriter("Evaluation")
-    gen_lines = get_all_lines("data/conv.txt")
-    gold_lines = get_all_lines("data/gold.txt")
+    gen_file = sys.argv[1]
+    gold_file = sys.argv[2]
+    gen_lines = get_all_lines(gen_file)
+    gold_lines = get_all_lines(gold_file)
     saved_model = "1_weights.pt"
 
     # Vocab
