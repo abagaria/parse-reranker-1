@@ -1,13 +1,25 @@
-Parse re-ranker (HW 1)
-- My final perplexity score on the validation data = 9.7
-- My hyperparameters:
-    - HIDDEN_SIZE = 1500
-    - EMBEDDING_SIZE = 100
-    - BATCH_SIZE = 20
-    - WINDOW_LENGTH = 50
-    - RNN_LAYERS = 1
-    - NUM_EPOCHS = 1
-- I tried training for more epochs (5), but that resulted in overfitting (dev loss and dev perplexity went up while the training loss + perplexity went down)
-- In order to mitigate overfitting while training for more epochs, I tried adding dropout (with probability 0.5) to the embedding layer. While this helped the perplexity score was 10.46)
-- I think that in order to train for more than 1 epoch and not overfit, I would have to shuffle the sentences in between epochs so as to prevent the model from memorizing the training data.
+ Parser reranker 2
+ ------------------
+
+ 1. For the last assignment, I was getting a perplexity of ~8 on the validation data
+ 2. However, when I evaluated the F-1 score for that model, I got a score of ~0.81
+ 3. I suspected that it was because I was using the "sentence gluing" technique in the first assignment
+ 4. I went back and re-implemented the 1st assignment with variable sentence lengths in each batch of data
+ 5. My final language model was batched and could handle variable length sentences
+ 6. However, I still get poor F-1 scores (~82.8)
+ 7. I tried different hyperparameters, which moved the F-1 score around but didnt help drastically
+    a) I tried hidden size of 1500, 512, 256 and 64. I got slightly better performance from hidden size of 256, but since a size of 
+       64 yielded similar results and was faster to train, I finally went with a hidden size (rnn size) of 64.
+    b) I tried embedding size of 100 and 500. Since they yielded similar results, my final model was trained with embedding size of 100
+    c) I trained for multiple epochs (5) and added dropout with p=0.5. That too did not make much of a difference to the final F1 score, so I trained with 1 epoch and no dropout
+ 8. In the end, I got an F-1 score of 82.76
+ 
+My final hyperparameters: 
+ HIDDEN_SIZE = 64
+ EMBEDDING_SIZE = 100
+ BATCH_SIZE = 20
+ WINDOW_LENGTH = 50
+ RNN_LAYERS = 1
+ NUM_EPOCHS = 1
+ DROPOUT_PROBABILITY = 0.
 
