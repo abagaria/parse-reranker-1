@@ -2,6 +2,7 @@
 import numpy as np
 import pdb
 from collections import defaultdict
+import pickle
 
 # PyTorch imports.
 import torch
@@ -9,17 +10,19 @@ import torch.nn.functional as F
 from tensorboardX import SummaryWriter
 
 # Other imports.
-from vocab import Vocab
 from model import NeuralParser
 from hyperparameters import *
 
 
-def get_vocab(training_file):
-    vocab_object = Vocab(training_file, padding=False)
-    unk_token = vocab_object.get_unk_token()
-    vocab_size = vocab_object.get_vocab_size()
-    print("Using {} as UNK token".format(unk_token))
-    return vocab_object.vocab, vocab_object.reverse_vocab, vocab_size, unk_token
+def get_vocab():
+    with open("vocab.pkl", "rb") as _f:
+        v = pickle.load(_f)
+    with open("reverse_vocab.pkl", "rb") as _f:
+        inverse_vocab = pickle.load(_f)
+    v_size = len(vocab)
+    unk = vocab["UNK*"]
+    print("Using vocab size {}, UNK token {}".format(v_size, unk))
+    return v, inverse_vocab, v_size, unk
 
 
 def read_line(line, vocab, unk_token):
@@ -163,13 +166,12 @@ def main():
 if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     writer = SummaryWriter("Evaluation")
-    training_data = "data/reranker_train.txt"
     gen_lines = get_all_lines("data/conv.txt")
     gold_lines = get_all_lines("data/gold.txt")
     saved_model = "1_weights.pt"
 
     # Vocab
-    vocab, reverse_vocab, vocab_size, unk_token = get_vocab(training_data)
+    vocab, reverse_vocab, vocab_size, unk_token = get_vocab()
     cc, ct, ng, cp = main()
 
     p = compute_precision(np.mean(cc), np.mean(ct))
