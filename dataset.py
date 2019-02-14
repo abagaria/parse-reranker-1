@@ -1,6 +1,5 @@
 # Python imports.
 import pdb
-from tqdm import tqdm
 from collections import defaultdict
 import pickle
 
@@ -33,7 +32,7 @@ class ParserDataset(Dataset):
 
     def read_sentences(self, sentences):
         sentence_vectors = []
-        for sentence in tqdm(sentences):
+        for sentence in sentences:
             if sentence != "STOP\n":
                 sentence_vectors.append(self.read_sentence(sentence))
         return sentence_vectors
@@ -52,7 +51,7 @@ class ParserDataset(Dataset):
 
         # copy over the actual sequences
         print("Padding input sentences..")
-        for i, x_len in tqdm(enumerate(x_lengths)):
+        for i, x_len in enumerate(x_lengths):
             sequence = sentences[i]
 
             # We do not include the last character in a seq/sentence as input
@@ -68,7 +67,7 @@ class ParserDataset(Dataset):
 
         # copy over the actual sequences
         print("Padding output sentences..")
-        for i, x_len in tqdm(enumerate(x_lengths)):
+        for i, x_len in enumerate(x_lengths):
             sequence = sentences[i]
 
             # We do not include the first character in a seq/sentence as label

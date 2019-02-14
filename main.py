@@ -1,7 +1,6 @@
 # Python imports.
 import sys
 import pdb
-from tqdm import tqdm
 import numpy as np
 import pickle
 
@@ -10,7 +9,6 @@ import torch
 import torch.nn as nn
 from torch import optim
 from torch.utils.data import DataLoader
-from tensorboardX import SummaryWriter
 
 # Other imports.
 from vocab import Vocab
@@ -43,8 +41,7 @@ def train(input_file, vocab, reverse_vocab):
     for epoch in range(1, NUM_EPOCHS + 1):
 
         for mode in modes:
-            for input_sequence, label_sequence, seq_length in tqdm(loaders[mode], desc='{}:{}/{}'.format(mode, epoch,
-                                                                                                         NUM_EPOCHS)):
+            for input_sequence, label_sequence, seq_length in loaders[mode]:
                 input_sequence = input_sequence.to(device)
                 label_sequence = label_sequence.to(device)
 
@@ -68,8 +65,8 @@ def train(input_file, vocab, reverse_vocab):
                     training_loss.append(loss.item())
 
                     # Logging
-                    writer.add_scalar("TrainingLoss", loss.item(), n_training_iterations)
-                    writer.add_scalar("TrainingPerplexity", perplexity, n_training_iterations)
+                    # writer.add_scalar("TrainingLoss", loss.item(), n_training_iterations)
+                    # writer.add_scalar("TrainingPerplexity", perplexity, n_training_iterations)
 
                 else:
                     network.eval()
@@ -84,8 +81,8 @@ def train(input_file, vocab, reverse_vocab):
                     validation_loss.append(loss.item())
 
                     # Logging
-                    writer.add_scalar("ValidationLoss", loss.item(), n_validation_iterations)
-                    writer.add_scalar("ValidationPerplexity", perplexity, n_validation_iterations)
+                    # writer.add_scalar("ValidationLoss", loss.item(), n_validation_iterations)
+                    # writer.add_scalar("ValidationPerplexity", perplexity, n_validation_iterations)
         torch.save(network.state_dict(), "{}_weights.pt".format(epoch))
 
     return training_loss, validation_loss
@@ -105,7 +102,6 @@ def main():
 if __name__ == "__main__":
     input_file_name = sys.argv[1]
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    writer = SummaryWriter()
 
     # Create vocab
     v = Vocab(input_file_name)

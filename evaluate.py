@@ -8,7 +8,7 @@ import pickle
 # PyTorch imports.
 import torch
 import torch.nn.functional as F
-from tensorboardX import SummaryWriter
+# from tensorboardX import SummaryWriter
 
 # Other imports.
 from model import NeuralParser
@@ -96,7 +96,7 @@ def evaluate_n_best(model, trees, sentence_number):
     for tree in trees:
         seq_probability = get_sequence_probability(model, tree)
         probabilities.append(seq_probability)
-    writer.add_scalar("BestParseProbability", np.max(probabilities), sentence_number)
+    # writer.add_scalar("BestParseProbability", np.max(probabilities), sentence_number)
     return np.argmax(probabilities)
 
 
@@ -149,9 +149,9 @@ def main():
                                                                                                chosen_num_total,
                                                                                                num_gold_tags))
 
-        writer.add_scalar("Precision", precision, sentence_number)
-        writer.add_scalar("Recall", recall, sentence_number)
-        writer.add_scalar("F1-Score", f1_score, sentence_number)
+        # writer.add_scalar("Precision", precision, sentence_number)
+        # writer.add_scalar("Recall", recall, sentence_number)
+        # writer.add_scalar("F1-Score", f1_score, sentence_number)
 
         line_number += num_sentence_parses + 1
         sentence_number += 1
@@ -166,7 +166,7 @@ def main():
 
 if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    writer = SummaryWriter("Evaluation")
+    # writer = SummaryWriter("Evaluation")
     gen_file = sys.argv[1]
     gold_file = sys.argv[2]
     gen_lines = get_all_lines(gen_file)

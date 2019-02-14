@@ -1,5 +1,4 @@
 # Python imports.
-from tqdm import tqdm
 
 # ------------------------------------
 # Data pre-processing functions
@@ -21,7 +20,7 @@ def create_data_splits(input_file):
     training_sentences, validation_lines = [], []
     print("Creating training and validation splits from {}".format(input_file))
     with open(input_file, "r") as _file:
-        for i, line in tqdm(enumerate(_file)):
+        for i, line in enumerate(_file):
             if i < num_training_lines:
                 training_sentences.append(line)
             else:

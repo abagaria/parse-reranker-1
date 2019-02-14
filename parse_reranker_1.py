@@ -1,7 +1,6 @@
 # Python imports.
 import sys
 import pdb
-from tqdm import tqdm
 import numpy as np
 
 # PyTorch imports.
@@ -44,7 +43,7 @@ def train(input_file):
     for epoch in range(1, NUM_EPOCHS + 1):
 
         for mode in modes:
-            for input_sequence, label_sequence in tqdm(loaders[mode], desc='{}:{}/{}'.format(mode, epoch, NUM_EPOCHS)):
+            for input_sequence, label_sequence in loaders[mode]:
                 input_sequence = input_sequence.to(device)
                 label_sequence = label_sequence.to(device)
 
