@@ -54,7 +54,6 @@ def train(input_file, vocab, reverse_vocab):
                     network.zero_grad()
 
                     logits = network(input_sequence, seq_length)
-                    pdb.set_trace()
 
                     padded_logits = torch.zeros(BATCH_SIZE, label_sequence.shape[1], vocab_size, device=device)
                     padded_logits[:, :logits.shape[1], :] = logits
