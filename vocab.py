@@ -1,20 +1,16 @@
 # Python imports.
 import pdb
+import pickle
 from collections import defaultdict
 
 
 class Vocab(object):
 
-    PAD_TOKEN = 0
-    START_TOKEN = 1
-
-    def __init__(self, input_file, padding=True):
+    def __init__(self, input_file):
         self.input_file = input_file
-        self.padding = padding
         self.training_data = self._get_training_data()
-
-        self.num_special_tokens = 2 if padding else 0
-        self.vocab, self.reverse_vocab = self._create_vocab(self.num_special_tokens)
+        self.vocab, self.reverse_vocab = self._create_vocab()
+        self.save_vocab()
 
     def _get_training_data(self):
         train_data = []
@@ -26,7 +22,7 @@ class Vocab(object):
     def get_vocab_size(self):
         return len(self.vocab.keys())
 
-    def _create_vocab(self, num_special_tokens=0):
+    def _create_vocab(self):
         all_words = []
         for line in self.training_data:
             words = line.split()
@@ -35,10 +31,23 @@ class Vocab(object):
         vocab = defaultdict()
         reverse_vocab = defaultdict()
         for idx, word in enumerate(word_set):
-            # Note: we are adding 2 so as to not conflict with the special tokens
-            vocab[word] = idx + num_special_tokens
-            reverse_vocab[idx + num_special_tokens] = word
+            vocab[word] = idx
+            reverse_vocab[idx] = word
         return vocab, reverse_vocab
 
     def get_unk_token(self):
         return self.vocab["*UNK"]
+
+    def get_pad_token(self):
+        return self.vocab["STOP"]
+
+    def save_vocab(self):
+        with open("vocab.pkl", "wb") as vf:
+            pickle.dump(self.vocab, vf)
+        with open("reverse_vocab.pkl", "wb") as ivf:
+            pickle.dump(self.reverse_vocab, ivf)
+
+
+if __name__ == "__main__":
+    f = "data/reranker_train.txt"
+    v = Vocab(f)
